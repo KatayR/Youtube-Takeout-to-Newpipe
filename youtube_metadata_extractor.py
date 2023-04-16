@@ -9,6 +9,7 @@ import googleapiclient.errors
 import os
 import re
 
+
 # get youtube api ready
 api_key = os.environ['YOUTUBE_API_KEY']
 youtube = googleapiclient.discovery.build(
@@ -23,19 +24,21 @@ def yt_time_to_seconds(time):
     match = regex.match(time)
     if match:
         minutes = int(match.group('minutes')) if match.group('minutes') else 0
-        seconds = int(match.group('seconds'))
+        seconds = int(match.group('seconds')) if match.group('seconds') else 0
         return minutes * 60 + seconds
     return 0
 
 
 # Define the URL of the HTML file containing the data
-with open("C:/Users/rasit/Desktop/watch_history.html", 'r', encoding='utf-8') as url:
+with open("C:/Users/rasit/Desktop/m_watch_history.html", 'r', encoding='utf-8') as url:
     soup = BeautifulSoup(url, "html.parser")
 
 # Find all the video links in the HTML
 blocks = soup.find_all(
     'div', class_='content-cell mdl-cell mdl-cell--6-col mdl-typography--body-1')
 
+# Initialize a variable to keep track of the uid value
+uid = 1901  # this is the highest uid number + 1 in my streams table of newpipe.db
 
 # Create a CSV file and write the header row
 csv_file = open("historyy.csv", "w", newline="", encoding='utf-8')
@@ -43,8 +46,6 @@ csv_writer = csv.writer(csv_file)
 csv_writer.writerow(["uid", "service_id", "url", "title", "stream_type", "duration", "uploader", "uploader_url",
                      "thumbnail_url", "view_count", "textual_upload_date", "upload_date", "is_upload_date_approximation"])
 
-# Initialize a variable to keep track of the uid value
-uid = 1901  # this is the highest uid number + 1 in my streams table of newpipe.db
 
 # Loop over the video links and write a row to the CSV file for each one
 for videos in blocks:
@@ -95,5 +96,7 @@ for videos in blocks:
     # Increment the uid value
     print(f"{uid-1900} done")
     uid += 1
+    if uid == 1903:
+        break
 # Close the CSV file
 csv_file.close()
