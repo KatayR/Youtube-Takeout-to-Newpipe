@@ -110,5 +110,5 @@ for videos in blocks:
     uid += 1
 # Close the CSV file
 end = time.time()
-print("it took" + (end - start) + "seconds")
+print('it took ' + '{:.2f}'.format(end - start) + ' seconds')
 csv_file.close()
