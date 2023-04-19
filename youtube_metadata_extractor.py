@@ -111,8 +111,6 @@ for videos in blocks:
 
     # Increment the uid value
     print(f"{uid-1900} done\n")
-    if uid == 1902:
-        break
     uid += 1
 # Close the CSV file
 end = time.time()
