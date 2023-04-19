@@ -6,11 +6,9 @@ import googleapiclient.discovery
 import os
 import googleapiclient.discovery
 import googleapiclient.errors
-import os
 import re
 
-
-# get youtube api ready
+# ready Youtube API
 api_key = os.environ['YOUTUBE_API_KEY']
 youtube = googleapiclient.discovery.build(
     'youtube', 'v3', developerKey=api_key)
@@ -30,7 +28,7 @@ def yt_time_to_seconds(time):
 
 
 # Define the URL of the HTML file containing the data
-with open("C:/Users/rasit/Desktop/m_watch_history.html", 'r', encoding='utf-8') as url:
+with open("C:/Users/rasit/Desktop/watch_history.html", 'r', encoding='utf-8') as url:
     soup = BeautifulSoup(url, "html.parser")
 
 # Find all the video links in the HTML
@@ -38,7 +36,7 @@ blocks = soup.find_all(
     'div', class_='content-cell mdl-cell mdl-cell--6-col mdl-typography--body-1')
 
 # Initialize a variable to keep track of the uid value
-uid = 1901  # this is the highest uid number + 1 in my streams table of newpipe.db
+uid = 1901  # this is the highest uid number + 1 in my streams table in newpipe.db
 
 # Create a CSV file and write the header row
 csv_file = open("historyy.csv", "w", newline="", encoding='utf-8')
@@ -46,12 +44,16 @@ csv_writer = csv.writer(csv_file)
 csv_writer.writerow(["uid", "service_id", "url", "title", "stream_type", "duration", "uploader", "uploader_url",
                      "thumbnail_url", "view_count", "textual_upload_date", "upload_date", "is_upload_date_approximation"])
 
+# used a stopwatch to see how long it takes
+start = time.time()
 
 # Loop over the video links and write a row to the CSV file for each one
 for videos in blocks:
     aTags = videos.find_all('a')
-    # Get the relevant data from the link
+    # Get the relevant data from the Takeout html
     for tag in aTags:
+        if '://' in tag.text.strip():
+            continue
         link = tag["href"]
         if link and "youtube.com" in link and not 'channel' in link:
             url = link
@@ -64,19 +66,29 @@ for videos in blocks:
     # Get the video ID from the URL
     video_id = url.split("=")[1]
 
-    # Call Youtube api for more info. Idk if this makes it faster or slower
+    # Call Youtube api for more info. Idk if this makes it faster or
+    # slower relative to using youtube-dl, BeautifulSoup and stuff
     request = youtube.videos().list(
         part="snippet,contentDetails,statistics",
         id=video_id
     )
     response = request.execute()
-    duration_response = response['items'][0]['contentDetails']['duration']
-    uploadDate_response = response['items'][0]['snippet']['publishedAt'][:10]
-    viewcount_response = response['items'][0]['statistics']['viewCount']
+    print(title + "\n" + url)
 
-    # Assign values returned rom API
+    try:  # this part checks if video is hidden. Yes, I know. But youtube API is broken. So I had to...
+        duration_response = response['items'][0]['contentDetails']['duration']
+        uploadDate_response = response['items'][0]['snippet']['publishedAt'][:10]
+    except:
+        duration_response = 'PT4M04S'
+        uploadDate_response = '2000-04-04'
+
+    # This checks if video is unlisted AND "you"(your api) can't access it. Api is weird.
+    try:
+        viewcount_response = response['items'][0]['statistics']['viewCount']
+    except:
+        viewcount_response = 404
+
     textual_upload_date = uploadDate_response
-
     struct_time = time.strptime(
         textual_upload_date, "%Y-%m-%d")
     seconds_since_epoch = time.mktime(struct_time)
@@ -94,7 +106,9 @@ for videos in blocks:
                         uploader, uploader_url, thumbnail_url, view_count, textual_upload_date, upload_date, 1])
 
     # Increment the uid value
-    print(f"{uid-1900} done")
+    print(f"{uid-1900} done\n")
     uid += 1
 # Close the CSV file
+end = time.time()
+print("it took" + (end - start) + "seconds")
 csv_file.close()
