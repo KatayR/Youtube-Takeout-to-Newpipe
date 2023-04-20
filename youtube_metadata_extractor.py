@@ -14,25 +14,6 @@ import youtube_dl
 ydl_opts = {}
 
 
-# # ready Youtube API
-# api_key = os.environ['YOUTUBE_API_KEY']
-# youtube = googleapiclient.discovery.build(
-#     'youtube', 'v3', developerKey=api_key)
-
-# # deal with youtubes time format like PT23M21S
-
-
-# def yt_time_to_seconds(time):
-#     regex_string = 'PT((?P<minutes>\d+)M)?((?P<seconds>\d+)S)?'
-#     regex = re.compile(regex_string)
-#     match = regex.match(time)
-#     if match:
-#         minutes = int(match.group('minutes')) if match.group('minutes') else 0
-#         seconds = int(match.group('seconds')) if match.group('seconds') else 0
-#         return minutes * 60 + seconds
-#     return 0
-
-
 # Define the URL of the HTML file containing the data
 with open("C:/Users/rasit/Desktop/m_watch_history.html", 'r', encoding='utf-8') as url:
     soup = BeautifulSoup(url, "html.parser")
@@ -72,13 +53,6 @@ for videos in blocks:
     # Get the video ID from the URL
     video_id = url.split("=")[1]
 
-    # Call Youtube api for more info. Idk if this makes it faster or
-    # slower relative to using youtube-dl, BeautifulSoup and stuff
-    # request = youtube.videos().list(
-    #     part="snippet,contentDetails,statistics",
-    #     id=video_id
-    # )
-    # response = request.execute()
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         scraped = ydl.extract_info(url, download=False)
 
