@@ -9,6 +9,6 @@ def remove_duplicates(input):
     print('removing duplicate rows...')
 
     df.drop_duplicates(subset=['url'], inplace=True)
-    print(f"Found {num_rows - df.shape[0]} duplicate rows and deleted")
+    print(f"Found {num_rows - df.shape[0]} duplicate rows and deleted.")
 
     df.to_csv(input, index=False, encoding='utf-8')
