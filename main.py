@@ -8,6 +8,7 @@ import googleapiclient.discovery
 import googleapiclient.errors
 import re
 from max_uid import find_max_uid
+from duplicate_remover import remove_duplicates
 
 
 # ready Youtube API
@@ -114,3 +115,6 @@ for videos in blocks:
 end = time.time()
 print('it took ' + '{:.2f}'.format(end - start) + ' seconds')
 csv_file.close()
+
+
+remove_duplicates('historyy.csv')
