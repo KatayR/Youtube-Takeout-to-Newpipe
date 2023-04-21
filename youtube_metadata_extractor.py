@@ -7,6 +7,8 @@ import os
 import googleapiclient.discovery
 import googleapiclient.errors
 import re
+from max_uid import find_max_uid
+
 
 # ready Youtube API
 api_key = os.environ['YOUTUBE_API_KEY']
@@ -28,7 +30,7 @@ def yt_time_to_seconds(time):
 
 
 # Define the URL of the HTML file containing the data
-with open("C:/Users/rasit/Desktop/watch_history.html", 'r', encoding='utf-8') as url:
+with open("C:/Users/rasit/Desktop/m_watch_history.html", 'r', encoding='utf-8') as url:
     soup = BeautifulSoup(url, "html.parser")
 
 # Find all the video links in the HTML
@@ -36,8 +38,8 @@ blocks = soup.find_all(
     'div', class_='content-cell mdl-cell mdl-cell--6-col mdl-typography--body-1')
 
 # Initialize a variable to keep track of the uid value
-uid = 1901  # this is the highest uid number + 1 in my streams table in newpipe.db
-
+max_uid = find_max_uid()
+uid = max_uid  # finds maximum uid number in your "streams" table
 # Create a CSV file and write the header row
 csv_file = open("historyy.csv", "w", newline="", encoding='utf-8')
 csv_writer = csv.writer(csv_file)
@@ -106,7 +108,7 @@ for videos in blocks:
                         uploader, uploader_url, thumbnail_url, view_count, textual_upload_date, upload_date, 1])
 
     # Increment the uid value
-    print(f"{uid-1900} done\n")
+    print(f"{uid-max_uid} done\n")
     uid += 1
 # Close the CSV file
 end = time.time()
