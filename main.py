@@ -10,7 +10,6 @@ import re
 from max_uid import find_max_uid
 from duplicate_remover import remove_duplicates
 from datetimeToTimestamp import convert_date_string
-from insert_to_NewpipeDOTdb import insertDatabase
 
 
 # ready the Youtube API
